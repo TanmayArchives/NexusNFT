@@ -3,7 +3,6 @@ import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { createContent } from '../utils/programInteractions';
 import { AppStateContext } from '../context/AppStateContext';
 import LoadingSpinner from './LoadingSpinner';
-import { storeContentId } from '../utils/contentStorage';
 
 const ContentCreation: React.FC = () => {
   const [contentUri, setContentUri] = useState('');
@@ -19,7 +18,7 @@ const ContentCreation: React.FC = () => {
     setIsLoading(true);
     try {
       const contentId = await createContent(wallet, contentUri);
-      storeContentId(contentId.toString());
+      console.log('Content created with ID:', contentId.toString());
       setNotification({ message: 'Content created successfully', type: 'success' });
       setContentUri('');
     } catch (error) {
@@ -43,7 +42,7 @@ const ContentCreation: React.FC = () => {
       />
       <button
         onClick={handleCreateContent}
-        className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 disabled:bg-gray-400"
+        className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
         disabled={isLoading}
       >
         {isLoading ? <LoadingSpinner /> : 'Create Content'}

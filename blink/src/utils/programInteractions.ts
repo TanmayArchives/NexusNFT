@@ -1,7 +1,10 @@
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider, web3, BN } from '@project-serum/anchor';
+import { Program, AnchorProvider, web3, BN, Idl } from '@project-serum/anchor';
 import idl from '../../public/idl.json';
+
+// Add this type definition
+type PostClaimExperienceProgram = Program<Idl>;
 
 const programID = new PublicKey("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
@@ -14,7 +17,7 @@ const getProvider = (wallet: AnchorWallet) => {
 
 export const registerNFT = async (wallet: AnchorWallet, nftMint: PublicKey) => {
   const provider = getProvider(wallet);
-  const program = new Program(idl as any, programID, provider);
+  const program = new Program(idl as Idl, programID, provider) as PostClaimExperienceProgram;
   await program.methods.registerNft(nftMint)
     .accounts({
       nftRegistry: web3.Keypair.generate().publicKey,
@@ -24,21 +27,24 @@ export const registerNFT = async (wallet: AnchorWallet, nftMint: PublicKey) => {
     .rpc();
 };
 
-export const createContent = async (wallet: AnchorWallet, contentUri: string) => {
+export const createContent = async (wallet: AnchorWallet, contentUri: string): Promise<PublicKey> => {
   const provider = getProvider(wallet);
-  const program = new Program(idl as any, programID, provider);
+  const program = new Program(idl as Idl, programID, provider) as PostClaimExperienceProgram;
+  const contentKeypair = web3.Keypair.generate();
   await program.methods.createContent(contentUri)
     .accounts({
-      content: web3.Keypair.generate().publicKey,
+      content: contentKeypair.publicKey,
       creator: provider.wallet.publicKey,
       systemProgram: web3.SystemProgram.programId,
     })
+    .signers([contentKeypair])
     .rpc();
+  return contentKeypair.publicKey;
 };
 
 export const grantAccess = async (wallet: AnchorWallet, nftMint: PublicKey, contentId: PublicKey) => {
   const provider = getProvider(wallet);
-  const program = new Program(idl as any, programID, provider);
+  const program = new Program(idl as Idl, programID, provider) as PostClaimExperienceProgram;
   await program.methods.grantAccess(nftMint)
     .accounts({
       accessControl: web3.Keypair.generate().publicKey,
@@ -51,7 +57,7 @@ export const grantAccess = async (wallet: AnchorWallet, nftMint: PublicKey, cont
 
 export const createReward = async (wallet: AnchorWallet, amount: number) => {
   const provider = getProvider(wallet);
-  const program = new Program(idl as any, programID, provider);
+  const program = new Program(idl as Idl, programID, provider) as PostClaimExperienceProgram;
   const rewardKeypair = web3.Keypair.generate();
   await program.methods.createReward(new BN(amount))
     .accounts({
@@ -66,7 +72,7 @@ export const createReward = async (wallet: AnchorWallet, amount: number) => {
 
 export const claimReward = async (wallet: AnchorWallet, rewardPublicKey: PublicKey) => {
   const provider = getProvider(wallet);
-  const program = new Program(idl as any, programID, provider);
+  const program = new Program(idl as Idl, programID, provider) as PostClaimExperienceProgram;
   await program.methods.claimReward()
     .accounts({
       reward: rewardPublicKey,

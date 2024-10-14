@@ -12,7 +12,7 @@ import { AnimatePresence } from 'framer-motion';
 import { AppStateProvider } from '../context/AppStateContext';
 import { ThemeProvider } from '../context/ThemeContext';
 
-require('@solana/wallet-adapter-react-ui/styles.css');
+import '@solana/wallet-adapter-react-ui/styles.css';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

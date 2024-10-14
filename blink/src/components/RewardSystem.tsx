@@ -3,6 +3,7 @@ import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { createReward, claimReward } from '../utils/programInteractions';
 import { AppStateContext } from '../context/AppStateContext';
 import LoadingSpinner from './LoadingSpinner';
+import { PublicKey } from '@solana/web3.js';
 
 const RewardSystem: React.FC = () => {
   const [rewardAmount, setRewardAmount] = useState('');
@@ -19,13 +20,22 @@ const RewardSystem: React.FC = () => {
     }
     setIsCreating(true);
     try {
-      await createReward(wallet, rewardAmount);
+      const amount = parseInt(rewardAmount, 10);
+      if (isNaN(amount)) {
+        throw new Error('Invalid reward amount');
+      }
+      const rewardPublicKey = await createReward(wallet, amount);
       setNotification({ message: 'Reward created successfully', type: 'success' });
       setRewardAmount('');
-      setRewardId('');
-    } catch (error) {
-      console.error('Error creating reward:', error);
-      setNotification({ message: `Failed to create reward: ${error.message}`, type: 'error' });
+      setRewardId(rewardPublicKey.toString());
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error creating reward:', error);
+        setNotification({ message: `Failed to create reward: ${error.message}`, type: 'error' });
+      } else {
+        console.error('Error creating reward:', error);
+        setNotification({ message: 'Failed to create reward', type: 'error' });
+      }
     } finally {
       setIsCreating(false);
     }
@@ -38,7 +48,7 @@ const RewardSystem: React.FC = () => {
     }
     setIsClaiming(true);
     try {
-      await claimReward(wallet, rewardId);
+      await claimReward(wallet, new PublicKey(rewardId));
       setNotification({ message: 'Reward claimed successfully', type: 'success' });
       setRewardId('');
     } catch (error) {
