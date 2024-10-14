@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_spl::token::{self, Token, TokenAccount, Transfer};
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
@@ -46,7 +47,17 @@ pub mod post_claim_experience {
         require!(!reward.is_claimed, ErrorCode::RewardAlreadyClaimed);
 
         // Transfer tokens from reward account to claimer
-        // (Implement token transfer logic here)
+        let transfer_amount = reward.amount;
+        let transfer_accounts = Transfer {
+            from: ctx.accounts.reward_token_account.to_account_info(),
+            to: ctx.accounts.claimer_token_account.to_account_info(),
+            authority: ctx.accounts.reward.to_account_info(),
+        };
+        let cpi_ctx = CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            transfer_accounts,
+        );
+        token::transfer(cpi_ctx, transfer_amount)?;
 
         reward.is_claimed = true;
         Ok(())
@@ -100,6 +111,19 @@ pub struct ClaimReward<'info> {
     pub reward: Account<'info, Reward>,
     #[account(mut)]
     pub claimer: Signer<'info>,
+    #[account(
+        mut,
+        constraint = reward_token_account.owner == reward.key(),
+        constraint = reward_token_account.mint == reward.token_mint
+    )]
+    pub reward_token_account: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        constraint = claimer_token_account.owner == claimer.key(),
+        constraint = claimer_token_account.mint == reward.token_mint
+    )]
+    pub claimer_token_account: Account<'info, TokenAccount>,
+    pub token_program: Program<'info, Token>,
 }
 
 #[account]
@@ -127,6 +151,7 @@ pub struct Reward {
     pub creator: Pubkey,
     pub amount: u64,
     pub is_claimed: bool,
+    pub token_mint: Pubkey,
 }
 
 #[error_code]

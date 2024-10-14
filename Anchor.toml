@@ -14,3 +14,7 @@ wallet = "/home/user/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+
+[dependencies]
+anchor-lang = "0.24.2"
+anchor-spl = "0.24.2"
