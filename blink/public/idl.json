@@ -1,0 +1,155 @@
+{
+  "version": "0.1.0",
+  "name": "post_claim_experience",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [],
+      "args": []
+    },
+    {
+      "name": "registerNft",
+      "accounts": [
+        {
+          "name": "nftRegistry",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nftMint",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "createContent",
+      "accounts": [
+        {
+          "name": "content",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "contentUri",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "grantAccess",
+      "accounts": [
+        {
+          "name": "accessControl",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "content",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nftMint",
+          "type": "publicKey"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "NFTRegistry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "nftMint",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Content",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "contentUri",
+            "type": "string"
+          },
+          {
+            "name": "isActive",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AccessControl",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nftMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "content",
+            "type": "publicKey"
+          },
+          {
+            "name": "isGranted",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "address": "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+  }
+}
